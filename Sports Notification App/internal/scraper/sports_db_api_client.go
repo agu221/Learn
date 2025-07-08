@@ -4,46 +4,48 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
-
-	"golang.org/x/text/date"
 )
 
-baseURL := "https://www.thesportsdb.com/api/v2/json/"
+const baseURL = "https://www.thesportsdb.com/api/v2/json/"
 
-type Event struct{
-	id string `json:"id"`
-	idEvent string `json:"idEvent"`
-	intDivision int `json:"intDivision"`
-	strSport string `json:"strSport"`
-	strEvent string `json:"strEvent"`
-	strEventThumb string `json:"strEventThumb"`
-	strTimeStamp string `json:"strTimeStamp"`
+type Event struct {
+	ID            string `json:"id"`
+	IDEvent       string `json:"idEvent"`
+	IntDivision   int    `json:"intDivision"`
+	StrSport      string `json:"strSport"`
+	StrEvent      string `json:"strEvent"`
+	StrEventThumb string `json:"strEventThumb"`
+	StrTimeStamp  string `json:"strTimeStamp"`
 }
 
 type Response struct {
-	index int `json:"index`
-	events []Event `json:"events"`
+	Index  int     `json:"index"`
+	Events []Event `json:"events"`
 }
 
-func GetEventsByDate(string date) (eventData) {
-	
+func GetEventsByDate(date string) (*Response, error) {
+
 	url := baseURL + "filter/" + date
 	resp, err := http.Get(url)
 
 	if err != nil {
-		log.Fatalf("Error making GET request: %v", err)
+		return nil, fmt.Errorf("GET Failed: %w", err)
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected status: %s", resp.Status)
+	}
 	responseData, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatalf("Error reading response body: %v", err)
+		return nil, fmt.Errorf("read Failed: %w", err)
 	}
-	
-	var responseObject Response
-	json.Unmarshal(responseData, &responseObject)
 
-	return responseObject
+	var result Response
+	if err := json.Unmarshal(responseData, &result); err != nil {
+		return nil, fmt.Errorf("JSON unmarshal failed: %w", err)
+	}
+
+	return &result, err
 }
