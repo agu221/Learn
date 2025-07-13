@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"errors"
 	"net/http"
 	"sports_team_manager/models"
 
@@ -31,4 +32,44 @@ func PostTeams(c *gin.Context) {
 // getTeams responds with the list of all teams as a JSON
 func GetTeams(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, teams)
+}
+
+func RegisterPlayerToTeam(c *gin.Context) {
+	var newPlayerRegistrationRequest models.PlayerRegistrationRequest
+	// Call BindJSON to bind the received JSON to the new Team
+	if err := c.BindJSON(&newPlayerRegistrationRequest); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	Player, err := searchPlayerInDB(newPlayerRegistrationRequest.PlayerName)
+	if err != nil {
+		customErr := &CustomError{Code: 4001, Message: "Player not found in Datebase."}
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   true,
+			"code":    customErr.Code,
+			"message": customErr.Message,
+		})
+		return
+	}
+	Team, err := searchTeamInDB(newPlayerRegistrationRequest.TeamName)
+	if err != nil {
+		customErr := &CustomError{Code: 4001, Message: "Team not found in Datebase."}
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   true,
+			"code":    customErr.Code,
+			"message": customErr.Message,
+		})
+		return
+	}
+	Team.Players = append(Team.Players, Player)
+	c.IndentedJSON(http.StatusCreated, newPlayerRegistrationRequest)
+}
+
+func searchTeamInDB(TeamName string) (models.Team, error) {
+	for _, t := range teams {
+		if t.TeamName == TeamName {
+			return t, nil
+		}
+	}
+	return models.Team{}, errors.New("Team not found")
 }

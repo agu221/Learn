@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"errors"
 	"net/http"
 	"sports_team_manager/models"
 	"time"
@@ -56,4 +57,13 @@ func createPlayerID() int {
 		}
 	}
 	return maxID + 1
+}
+
+func searchPlayerInDB(playerName string) (models.Player, error) {
+	for _, p := range players {
+		if p.PlayerName == playerName {
+			return p, nil
+		}
+	}
+	return models.Player{}, errors.New("Player not found")
 }

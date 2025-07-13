@@ -2,10 +2,15 @@ package models
 
 // Team struct represents data about a team
 type Team struct {
-	TeamID   int      `json:"team_id"`
-	TeamName string   `json:"team_name"`
-	Sport    string   `json:"sport"`
-	League   string   `json:"league"`
-	Division string   `json:"division"`
-	Players  []Player `json:"players"`
+	TeamID   int      `json:"TeamID"`
+	TeamName string   `json:"TeamName"`
+	Sport    string   `json:"Sport"`
+	League   string   `json:"League"`
+	Division string   `json:"Division"`
+	Players  []Player `json:"Players"`
+}
+
+type PlayerRegistrationRequest struct {
+	TeamName   string `json:"TeamName"`
+	PlayerName string `json:"PlayerName"`
 }
