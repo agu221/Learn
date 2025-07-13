@@ -17,7 +17,7 @@ var players = []models.Player{
 
 // postPlayers adds a Player from a JSON received in the request body
 func PostPlayers(c *gin.Context) {
-	var newPlayer models.Player
+	var newPlayer models.AddPlayerFormat
 
 	// Call BindJSON to bind the received JSON to the new Team
 	if err := c.BindJSON(&newPlayer); err != nil {
@@ -25,11 +25,35 @@ func PostPlayers(c *gin.Context) {
 		return
 	}
 	// Add new team to slice
-	players = append(players, newPlayer)
-	c.IndentedJSON(http.StatusCreated, newPlayer)
+	newPlayerComplete := models.Player{PlayerID: createPlayerID(),
+		PlayerName: newPlayer.PlayerName,
+		DOB:        newPlayer.DOB,
+		Age:        getPlayerAge(newPlayer.DOB)}
+	players = append(players, newPlayerComplete)
+	c.IndentedJSON(http.StatusCreated, newPlayerComplete)
 }
 
 // getTeams responds with the list of all teams as a JSON
 func GetPlayers(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, players)
+}
+
+// getPlayerAge uses the player BOD to create their age variable
+func getPlayerAge(DOB time.Time) int {
+	today := time.Now()
+	age := today.Year() - DOB.Year()
+	if today.Month() >= DOB.Month() && today.Day() >= DOB.Day() {
+		age += 1
+	}
+	return age
+}
+
+func createPlayerID() int {
+	maxID := 0
+	for _, p := range players {
+		if p.PlayerID > maxID {
+			maxID = p.PlayerID
+		}
+	}
+	return maxID + 1
 }
