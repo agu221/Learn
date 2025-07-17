@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sports Team Manager</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <h1>Team Roster</h1>
+  <ul id = "player-list"><ul></ul>
+
+  <script>
+  async function fectchPlayers() {
+    try{
+    const response = await fetch('/players');
+    const players = await response.json();
+    const list =document.getElementById('player-list'); 
+    
+    if (players.length===0){
+        list.innerHTML = "<li>No players found.</li>";
+    }else{
+        players.forEach(player=>{
+            const li = document.createElement('li');
+            li.textContent = `${player.PlayerName} (Age ${player.Age}) — DOB: ${new Date(player.DOB).toLocaleDateString()}`;
+            list.appendChild(li);
+        });
+    }
+}catch(err){
+    console.error("Error fetching players:",err);
+}
+
+}
+fectchPlayers();
+</script>
+</body>
+
+</html>

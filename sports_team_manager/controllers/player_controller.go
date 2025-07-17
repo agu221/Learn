@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"sports_team_manager/models"
+	"sports_team_manager/storage"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -36,7 +37,25 @@ func PostPlayers(c *gin.Context) {
 
 // getTeams responds with the list of all teams as a JSON
 func GetPlayers(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, players)
+	rows, err := storage.DB.Query("SELECT * FROM players")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	defer rows.Close()
+
+	var players []models.Player
+	for rows.Next() {
+		var p models.Player
+		if err := rows.Scan(&p.PlayerID, &p.PlayerName, &p.DOB, &p.Age); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		players = append(players, p)
+	}
+
+	c.JSON(http.StatusOK, players)
 }
 
 // getPlayerAge uses the player BOD to create their age variable
