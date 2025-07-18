@@ -1,20 +1,88 @@
+* {
+  box-sizing: border-box;
+}
 body {
-  font-family: sans-serif;
-  background-color: #f0f0f0;
-  padding: 40px;
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  background: linear-gradient(180deg, rgba(37, 150, 190, 0.3) 0%, #ffffff 100%);
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+.login-container {
+  width: 100%;
+  max-width: 420px;
+  background: #fff;
+  padding: 40px 30px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
   text-align: center;
 }
-
-ul {
-  list-style-type: none;
-  padding: 0;
+.logo {
+  max-width: 160px;
+  margin: 0 auto 10px;
 }
-
-li {
-  background: white;
-  padding: 10px;
-  margin: 10px auto;
+.slogan {
+  color: #555;
+  font-size: 14px;
+  margin-bottom: 30px;
+}
+input {
+  width: 100%;
+  padding: 12px 16px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
   border-radius: 8px;
-  width: 300px;
-  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+  font-size: 15px;
+}
+button {
+  width: 100%;
+  padding: 12px;
+  background-color: #0066ff;
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-bottom: 15px;
+}
+.social-login {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 20px 0;
+}
+.social-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #f1f1f1;
+  border: none;
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+.social-button:hover {
+  background: #e2e2e2;
+}
+.link-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  margin-top: 10px;
+}
+a {
+  text-decoration: none;
+  color: #0066ff;
+}
+a:hover {
+  text-decoration: underline;
+}
+.social-button {
+  color: black;
 }
