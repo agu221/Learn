@@ -37,7 +37,12 @@ func PostPlayers(c *gin.Context) {
 
 // getTeams responds with the list of all teams as a JSON
 func GetPlayers(c *gin.Context) {
-	rows, err := storage.DB.Query("SELECT * FROM players")
+	if storage.DB == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database not initialized"})
+		return
+	}
+
+	rows, err := storage.DB.Query("SELECT * FROM players;")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

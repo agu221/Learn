@@ -19,5 +19,7 @@ func SetupRouter() *gin.Engine {
 	router.GET("/players", controllers.GetPlayers)
 	router.POST("/players", controllers.PostPlayers)
 	router.POST("/teams/register", controllers.RegisterPlayerToTeam)
+	router.POST("/login", controllers.UserLoginHandler)
+	router.POST("/register", controllers.UserRegisterHandler)
 	return router
 }
