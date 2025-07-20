@@ -3,14 +3,11 @@ package models
 import "time"
 
 type Player struct {
-	PlayerID   int       `json:"PlayerID"`
-	PlayerName string    `json:"PlayerName"`
-	DOB        time.Time `json:"DOB"`
-	Age        int       `json:"Age"`
+	PlayerFirstName string    `json:"PlayerFirstName"`
+	PlayerLastName  string    `json:"PlayerLastName"`
+	DOB             time.Time `json:"DOB"`
 }
 
-// DTO for player registration jsons
-type AddPlayerFormat struct {
-	PlayerName string    `json:"PlayerName"`
-	DOB        time.Time `json:"DOB"`
+type PlayerName struct {
+	PlayerName string `json:"PlayerName"`
 }

@@ -1,93 +1,92 @@
 package controllers
 
 import (
-	"errors"
 	"net/http"
 	"sports_team_manager/models"
 	"sports_team_manager/storage"
-	"time"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
-// Player slice to seed player data
-var players = []models.Player{
-	{PlayerID: 1, PlayerName: "Jason Jordan", DOB: time.Date(2001, time.August, 11, 0, 0, 0, 0, time.UTC), Age: 24},
-	{PlayerID: 2, PlayerName: "Tristan Tordan", DOB: time.Date(2001, time.August, 11, 0, 0, 0, 0, time.UTC), Age: 24},
-	{PlayerID: 3, PlayerName: "Dominic Dorban", DOB: time.Date(2001, time.August, 11, 0, 0, 0, 0, time.UTC), Age: 24},
-}
-
 // postPlayers adds a Player from a JSON received in the request body
 func PostPlayers(c *gin.Context) {
-	var newPlayer models.AddPlayerFormat
+	var newPlayer models.Player
 
 	// Call BindJSON to bind the received JSON to the new Team
 	if err := c.BindJSON(&newPlayer); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	// Add new team to slice
-	newPlayerComplete := models.Player{PlayerID: createPlayerID(),
-		PlayerName: newPlayer.PlayerName,
-		DOB:        newPlayer.DOB,
-		Age:        getPlayerAge(newPlayer.DOB)}
-	players = append(players, newPlayerComplete)
-	c.IndentedJSON(http.StatusCreated, newPlayerComplete)
+	if storage.DB == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "No connection to database"})
+		return
+	}
+	_, err := storage.DB.Exec("INSERT INTO players (first_name, last_name, dob) VALUES($1,$2,$3)", newPlayer.PlayerFirstName, newPlayer.PlayerLastName, newPlayer.DOB)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database insertion error"})
+	}
+	c.IndentedJSON(http.StatusCreated, newPlayer)
 }
 
 // getTeams responds with the list of all teams as a JSON
-func GetPlayers(c *gin.Context) {
+func GetPlayers(c *gin.Context) ([]models.Player, error) {
+	var players []models.Player
 	if storage.DB == nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database not initialized"})
-		return
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "No connection to database"})
+		return players, db_connection_error()
 	}
 
-	rows, err := storage.DB.Query("SELECT * FROM players;")
+	rows, err := storage.DB.Query("SELECT first_name, last_name, date_of_birth FROM players;")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
+		return players, err
 	}
 
 	defer rows.Close()
 
-	var players []models.Player
 	for rows.Next() {
 		var p models.Player
-		if err := rows.Scan(&p.PlayerID, &p.PlayerName, &p.DOB, &p.Age); err != nil {
+		if err := rows.Scan(&p.PlayerFirstName, &p.PlayerLastName, &p.DOB); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
+			return players, err
 		}
 		players = append(players, p)
 	}
 
-	c.JSON(http.StatusOK, players)
+	return players, nil
 }
 
-// getPlayerAge uses the player BOD to create their age variable
-func getPlayerAge(DOB time.Time) int {
-	today := time.Now()
-	age := today.Year() - DOB.Year()
-	if today.Month() >= DOB.Month() && today.Day() >= DOB.Day() {
-		age += 1
+func searchPlayerInDB(c *gin.Context) (int, error) {
+	var req models.PlayerName
+	if storage.DB == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "No connection to database"})
+		return -1, db_connection_error()
 	}
-	return age
+	if err := c.BindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return -1, err
+	}
+	first_name, last_name := splitFullName(req.PlayerName)
+
+	var playerID int
+	err := storage.DB.QueryRow("SELECT player_id FROM players WHERE LOWER(first_name) = LOWER($1) AND LOWER(last_name) = LOWER($2);", first_name, last_name).Scan(&playerID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return -1, err
+	}
+
+	return playerID, nil
 }
 
-func createPlayerID() int {
-	maxID := 0
-	for _, p := range players {
-		if p.PlayerID > maxID {
-			maxID = p.PlayerID
-		}
+func splitFullName(fullName string) (string, string) {
+	parts := strings.Fields(fullName)
+	if len(parts) == 0 {
+		return "", ""
+	} else if len(parts) == 1 {
+		return parts[0], ""
 	}
-	return maxID + 1
-}
 
-func searchPlayerInDB(playerName string) (models.Player, error) {
-	for _, p := range players {
-		if p.PlayerName == playerName {
-			return p, nil
-		}
-	}
-	return models.Player{}, errors.New("Player not found")
+	// First name = first word, Last name = rest joined
+	return parts[0], strings.Join(parts[1:], " ")
 }

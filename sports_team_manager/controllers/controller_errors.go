@@ -12,3 +12,7 @@ type CustomError struct {
 func (e *CustomError) Error() string {
 	return fmt.Sprintf("Error Code %d: %s", e.Code, e.Message)
 }
+
+func db_connection_error() error {
+	return &CustomError{Code: 23, Message: "Could not connect to the Database"}
+}

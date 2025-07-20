@@ -1,11 +1,11 @@
-async function loginUser(email, password){
+async function loginUser(emailOrUsername, password){
     try{
-        const response = await fetch('/login',{
+        const response = await fetch('/users/login',{
             method: 'POST',
             headers:{
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({email,password})
+            body: JSON.stringify({emailOrUsername,password})
         }
         );
 
@@ -14,9 +14,9 @@ async function loginUser(email, password){
         }
 
         const data = await response.json();
-        // localStorage.setItem('accessToken', data.accessToken);
-        // localStorage.setItem('refreshToken', data.refreshToken);
-        console.log('Login sucessful');        
+        localStorage.setItem('accessToken', data.accessToken);
+        localStorage.setItem('refreshToken', data.refreshToken);
+        window.location.href = "/user-dashboard";
     }
     catch(error){
         console.error('Error during login:', error.message);

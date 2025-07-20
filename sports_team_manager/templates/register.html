@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rosterfy Registration</title>
+  <link rel="icon" type="image/svg+xml" href="../static/assets/logo.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../static/style.css" />
+</head>
+<body>
+
+  <div class="register-container">
+    <img src="../static/assets/logo.png" alt="Rosterfy Logo" class="logo"/>
+    <div class="slogan">Manage your team</div>
+
+    <form>
+      <div class="name-row">
+    <div class="name-field">
+      <label for="firstName" class="label">First Name</label>
+      <input id="firstName" type="text" placeholder="First Name" required />
+    </div>
+    <div class="name-field">
+      <label for="lastName" class="label">Last Name</label>
+      <input id="lastName" type="text" placeholder="Last Name" required />
+    </div>
+  <div class="name-field">
+      <label for="username" class="label">Username</label>
+      <input id="username" type="text" placeholder="Username" required />
+    </div>  
+  </div>
+      <label for="dob-day" class="dob-label">Date of Birth</label>
+      <div class="dob-row">
+        <select name="dob-day" id="dob-day" required>
+          <option value = "">Day</option>
+        </select>
+        
+      <select name="dob-month" id="dob-month" required>
+        <option value="">Month</option>
+        <option value="1">January</option>
+        <option value="2">February</option>
+        <option value="3">March</option>
+        <option value="4">April</option>
+        <option value="5">May</option>
+        <option value="6">June</option>
+        <option value="7">July</option>
+        <option value="8">August</option>
+        <option value="9">September</option>
+        <option value="10">October</option>
+        <option value="11">November</option>
+        <option value="12">December</option>
+      </select>
+      <select name="dob-year" id="dob-year" required>
+    <option value="">Year</option>
+    <!-- Populated via JS below -->
+    </select>
+      </div>
+  
+      <div class="form-row">
+  <div class="form-section">
+    <label for="email" class="form-label">Email</label>
+    <input type="email" id="email" name="email" placeholder="email@email.com" />
+  </div>
+  <div class="form-section">
+    <label for="phone" class="form-label">Phone Number</label>
+    <input type="tel" id="phone" name="phone" placeholder="+27 12 345 6789" />
+  </div>
+</div>
+  <div class="name-row">
+    <div class="name-field">
+      <label for="password" class="label">Password</label>
+      <input id="password" type="password" placeholder="Password" required pattern="(?=.*\d)(?=.*[\W_]).{7,}" title="Minimum of 7 characters. Should have at least one special character and one number.">
+    </div>
+    <div class="name-field">
+      <label for="confirm_password" class="label">Confirm Password</label>
+      <input id="confirm_password" type="password" placeholder="Re-type Password" required />
+    </div>
+    </div>
+ <div class="form-row">
+  <div class="form-section">
+  <label for="role" class="form-label">Role</label>
+  <select id="role" name="role" required>
+    <option value="">Select Role</option>
+    <option value="player">Player</option>
+    <option value="coach">Coach</option>
+    <option value="manager">Manager</option>
+    <option value="league">League</option>
+  </select>
+</div>
+<div class="form-section">
+  <label for="gender" class="form-label">Gender</label>
+  <select id="gender" name="gender" required>
+    <option value="">Select Gender</option>
+    <option value="male">Male</option>
+    <option value="female">Female</option>
+    <option value="other">Other</option>
+    <option value="not_said">Prefer not to say</option>
+  </select>
+</div>
+ </div>
+<div class="link-row">
+      <a href="/login">Already a member? </a>
+    </div>
+   <button type="submit" class="sign_up_button">Become a member!</button>
+
+</form>
+       
+    <div class="social-login">
+      <button class="social-button"><img src="https://img.icons8.com/color/20/google-logo.png"/> Sign in with Google</button>
+      <button class="social-button"><img src="https://img.icons8.com/ios-filled/20/000000/facebook-new.png"/> Sign in with Facebook</button>
+      <button class="social-button"><img src="https://img.icons8.com/ios-filled/20/mac-os.png"/> Sign in with Apple</button>
+      <button class="social-button"><img src="https://img.icons8.com/ios-filled/20/000000/lock--v1.png"/> Sign in with SSO</button>
+    </div>
+  </div>
+
+  <script src="../static/register.js"></script>
+    <script>          
+        document.querySelector("form").addEventListener("submit", async function(e){
+                e.preventDefault();
+
+                const Username = document.getElementById("username").value;
+                const FirstName = document.getElementById("firstName").value;
+                const LastName = document.getElementById("lastName").value;
+                const DOB = new Date(`${document.getElementById("dob-year").value}-${document.getElementById("dob-month").value}-${document.getElementById("dob-day").value}`);
+                const Email = document.getElementById("email").value;
+                const PhoneNumber = document.getElementById("phone").value;
+                const Password = document.getElementById("password").value;
+                const confirmPasword = document.getElementById("confirm_password").value;
+                const Role = document.getElementById("role").value;
+                const Gender = document.getElementById("gender").value;
+
+                await registerUser(Username, FirstName, LastName, DOB, Email,PhoneNumber,Password, confirmPasword, Role, Gender)
+            })
+        </script>
+      <script>
+  // Populate day dropdown (1 to 31)
+  const daySelect = document.getElementById("dob-day");
+  for (let i = 1; i <= 31; i++) {
+    const option = document.createElement("option");
+    option.value = i;
+    option.text = i;
+    daySelect.appendChild(option);
+  }
+
+  // Populate year dropdown (e.g. 2008–1940)
+  const yearSelect = document.getElementById("dob-year");
+  const currentYear = new Date().getFullYear();
+  const oldestYear = currentYear - 85;
+  const youngestYear = currentYear - 10; // 13+ restriction
+
+  for (let y = youngestYear; y >= oldestYear; y--) {
+    const option = document.createElement("option");
+    option.value = y;
+    option.text = y;
+    yearSelect.appendChild(option);
+  }
+</script>
+
+     </body>
+</html>
