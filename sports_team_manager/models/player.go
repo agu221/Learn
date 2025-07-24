@@ -11,3 +11,8 @@ type Player struct {
 type PlayerName struct {
 	PlayerName string `json:"PlayerName"`
 }
+
+type PlayerTeams struct {
+	PlayerID           int                              `json:"PlayerID"`
+	RegisteredTeamsArr []RegisteredTeamsPlayerDashboard `json:"RegisteredTeams"`
+}

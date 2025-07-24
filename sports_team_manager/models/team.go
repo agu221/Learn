@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 // Team struct represents data about a team
 type Team struct {
 	TeamName string `json:"TeamName"`
@@ -22,4 +24,11 @@ type PlayerRegistrationRequest struct {
 
 type TeamName struct {
 	TeamName string `json:"TeamName"`
+}
+
+type RegisteredTeamsPlayerDashboard struct {
+	TeamName      string    `db:"team_name"`
+	Sport         string    `db:"sport"`
+	LeagueName    string    `db:"league_name"`
+	NextMatchDate time.Time `db:"match_date"`
 }

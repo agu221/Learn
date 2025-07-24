@@ -90,3 +90,37 @@ func splitFullName(fullName string) (string, string) {
 	// First name = first word, Last name = rest joined
 	return parts[0], strings.Join(parts[1:], " ")
 }
+
+func getRegisteredTeamsByPlayer(playerID int) ([]models.RegisteredTeamsPlayerDashboard, error) {
+
+	var RTPD []models.RegisteredTeamsPlayerDashboard
+	if storage.DB == nil {
+		return RTPD, db_connection_error()
+	}
+	rows, err := storage.DB.Query(`SELECT team.team_name,
+		team.sport,
+		leag.league_name,
+		fix.match_date
+		FROM team_players tp
+		JOIN teams team ON team.team_id = tp.team_id
+		JOIN fixtures fix ON fix.home_team_id = team.team_id OR fix.away_team_id = team.team_id
+		JOIN leagues leag ON leag.league_id = team.league_id
+		WHERE tp.player_id = $1 
+		ORDER BY fix.match_date DESC
+		LIMIT 1;
+	`, playerID)
+	if err != nil {
+		return RTPD, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var curr models.RegisteredTeamsPlayerDashboard
+		if err := rows.Scan(&curr.TeamName, &curr.Sport, &curr.LeagueName, &curr.NextMatchDate); err != nil {
+			return RTPD, err
+		}
+		RTPD = append(RTPD, curr)
+	}
+
+	return RTPD, nil
+}
