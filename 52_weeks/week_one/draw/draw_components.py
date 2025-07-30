@@ -1,6 +1,7 @@
 import curses
-from game_objects import blocks
+
 from draw import statics
+from game_objects import blocks
 
 
 class Screen:
@@ -47,13 +48,7 @@ class Screen:
         while True:
             key = self.stdscr.getch()
             if key in [10, 13, ord(" "), curses.KEY_ENTER]:
-                self.GoToGame()
+                self.stdscr.clear()
+                return
             elif key == ord("q"):
                 break
-
-    def GoToGame(self):
-        self.stdscr.clear()
-        new_block = blocks.Block()
-        self.stdscr.addstr(new_block.x_pos, new_block.y_pos, new_block.art)
-        self.stdscr.refresh()
-        self.stdscr.getch()

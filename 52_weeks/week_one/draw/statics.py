@@ -10,3 +10,5 @@ TITLE_NAME = """
 """
 
 WELCOME_TEXT = "Press any button to start."
+PLAYER_ICON = "o"
+DEAD_PLAYER_ICON = "x"
