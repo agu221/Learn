@@ -26,8 +26,11 @@ class Player:
     def isFalling(self):
         pass
 
-    def update(self):
+    def update(self, dt):
         if not self.isOnGround:
             self.curr_y -= self.fallSpeed
         if self.isDead:
             self.icon = statics.DEAD_PLAYER_ICON
+
+    def handle_input(self, input):
+        pass
